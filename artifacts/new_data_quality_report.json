@@ -1,0 +1,10 @@
+{
+  "records_processed": 3,
+  "processed_feature_count": 11,
+  "missing_values_after_preprocessing": 0,
+  "unknown_categories": {
+    "payment_method": [
+      "mailed check"
+    ]
+  }
+}

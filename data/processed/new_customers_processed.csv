@@ -1,0 +1,4 @@
+customer_id,age,tenure_months,monthly_charges,contract_type_month-to-month,contract_type_one year,contract_type_two year,payment_method_bank transfer,payment_method_credit card,payment_method_electronic check,internet_service_dsl,internet_service_fiber optic
+N001,0.12862190523366926,-0.39607397451497806,0.3495947236837372,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0
+N002,-0.15872490433091038,-0.9769824704702792,-1.3102056403108195,1.0,0.0,0.0,0.0,0.0,1.0,1.0,0.0
+N003,1.9348018510681697,1.5050811031569165,1.9220371737838435,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0

@@ -1,0 +1,4 @@
+customer_id,age,tenure_months,monthly_charges,contract_type,payment_method,internet_service
+N001,41,14,76.25,Month-to-month,Credit card,Fiber optic
+N002,,3,52.50,Month-to-month,,DSL
+N003,63,50,98.75,Two year,Mailed check,Fiber optic
