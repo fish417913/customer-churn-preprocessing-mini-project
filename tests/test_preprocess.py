@@ -7,6 +7,7 @@ from preprocess import (
     separate_features_and_target,
     split_data, 
     validate_feature_schema,
+    validate_inference_schema,
     validate_schema
 )
 
@@ -214,3 +215,44 @@ def test_find_unknown_categories_detects_unseen_value() -> None:
     assert unknown_categories == {
         "payment_method": ["mailed check"]
     }
+    
+def test_validate_inference_schema_requires_customer_id() -> None:
+    future_df = pd.DataFrame(
+        {
+            "age": [41],
+            "tenure_months": [14],
+            "monthly_charges": [76.25],
+            "contract_type": ["month-to-month"],
+            "payment_method": ["credit card"],
+            "internet_service": ["fiber optic"]
+        }
+    )
+    
+    with pytest.raises(
+        ValueError,
+        match="customer_id"
+    ):
+        validate_inference_schema(future_df)
+        
+def test_clean_data_coerces_invalid_numeric_strings() -> None:
+    future_df = pd.DataFrame(
+        {
+            "customer_id": ["N001", "N002"],
+            "age": ["41", "unknown"],
+            "tenure_months": ["14", "-3"],
+            "monthly_charges": ["76.25", "not available"],
+            "contract_type": ["Month-to-month", "One year"],
+            "payment_method": ["Credit card", "Bank transfer"],
+            "internet_service": ["Fiber optic", "DSL"]
+        }
+    )
+    
+    cleaned_df = clean_data(future_df)
+    
+    assert cleaned_df.loc[0, "age"] == 41
+    assert cleaned_df.loc[0, "tenure_months"] == 14
+    assert cleaned_df.loc[0, "monthly_charges"] == 76.25
+    
+    assert pd.isna(cleaned_df.loc[1, "age"])
+    assert pd.isna(cleaned_df.loc[1, "tenure_months"])
+    assert pd.isna(cleaned_df.loc[1, "monthly_charges"])

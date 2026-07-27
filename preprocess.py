@@ -66,10 +66,32 @@ def validate_feature_schema(df: pd.DataFrame) -> None:
     if missing_features:
         missing_list = ", ".join(sorted(missing_features))
         raise ValueError(f"Missing required features: {missing_list}")
+    
+def validate_inference_schema(df: pd.DataFrame) -> None:
+    """Validate columns required when transforming future records."""
+    required_columns = {
+        "customer_id",
+        *NUMERICAL_FEATURES,
+        *CATEGORICAL_FEATURES
+    }
+    
+    missing_columns = required_columns - set(df.columns)
+    
+    if missing_columns:
+        missing_list = ", ".join(sorted(missing_columns))
+        raise ValueError(
+            f"Missing required inference columns: {missing_list}"
+        )
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     """Standardize values and mark invalid observations as missing."""
     cleaned_df = df.copy()
+    
+    for column in NUMERICAL_FEATURES:
+        cleaned_df[column] = pd.to_numeric(
+            cleaned_df[column],
+            errors="coerce"
+        )
 
     categorical_columns = CATEGORICAL_FEATURES.copy()
     
