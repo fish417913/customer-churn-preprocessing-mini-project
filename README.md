@@ -520,6 +520,39 @@ Data-quality status:
 The incoming data contains a value not observed during training.
 ```
 
+## Progress and Key Learnings
+
+This mini-project produced a reproducible preprocessing workflow that converts messy customer-churn data into validated, model-ready datasets. The completed pipeline separates data-quality checks from statistical preprocessing and supports both model-training data and future inference records.
+
+### Progress Completed
+
+The project now includes:
+
+* Schema validation to confirm that required columns are present.
+* Rule-based cleaning for missing, malformed, and invalid values.
+* Numeric type coercion using `pd.to_numeric(..., errors="coerce")`.
+* A train/test split performed before fitting preprocessing steps, preventing data leakage.
+* Median imputation and standardization for numeric features.
+* Most-frequent imputation and one-hot encoding for categorical features.
+* A fitted scikit-learn `ColumnTransformer` saved as `artifacts/preprocessor.joblib`.
+* Separate validation and transformation logic for new customer records.
+* Processed training, testing, and inference datasets saved under `data/processed/`.
+* A data-quality report for new records saved as `artifacts/new_data_quality_report.json`.
+* Five automated tests covering important preprocessing behaviors.
+
+### Key Learnings
+
+The most important lesson was that successful preprocessing requires more than handling visibly missing values. A value can be present in a dataset while still being invalid, such as a text value in a numeric column or a category that was not observed during training. Validation must therefore examine column presence, expected data types, valid ranges, and categorical values.
+
+The project also reinforced the importance of separating training-time preprocessing from inference-time preprocessing. The preprocessor must be fitted only on the training data and then reused without refitting for test data or future customer records. This prevents leakage and ensures that production predictions use the same transformations as the model originally received.
+
+Another key learning involved schema drift. New data may contain all required columns but still fail because their underlying data types have changed. Explicitly coercing numeric features before transformation makes the pipeline more resilient while allowing invalid values to be identified and handled consistently.
+
+Finally, the project demonstrated the value of preserving row alignment and producing quality reports alongside transformed data. A preprocessing pipeline should not only generate model-ready features; it should also make it possible to trace problems back to the original records, understand how the data changed, and verify the workflow through automated tests.
+
+Overall, the mini-project strengthened my understanding of how validation, cleaning, feature transformation, artifact persistence, and inference-time safeguards work together to create a reliable AI engineering pipeline.
+
+
 ## Installation
 
 Create and activate a virtual environment:
