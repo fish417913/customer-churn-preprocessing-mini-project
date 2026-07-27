@@ -721,3 +721,64 @@ A reusable AI engineering preprocessing system must:
 * Include automated tests
 
 The resulting datasets are ready to serve as inputs to a future customer-churn classification model.
+
+## Debugging Improvements
+
+This project was hardened against two inference-time preprocessing failures.
+
+### 1. Inference Schema Validation
+
+The original feature validation checked only the model input columns. However, the future-data transformation workflow also required `customer_id` when creating the processed output.
+
+A new `validate_inference_schema()` function now verifies that incoming inference data contains:
+
+* `customer_id`
+* All numerical features
+* All categorical features
+
+This provides a clear validation error instead of allowing the workflow to fail later with a `KeyError`.
+
+### 2. Numeric Data-Type Drift
+
+Future CSV files may contain numeric values represented as strings or invalid text values such as `"unknown"` or `"not available"`.
+
+The cleaning process now converts numerical columns using:
+
+```python
+pd.to_numeric(column, errors="coerce")
+```
+
+Valid numeric strings are converted to numbers, while malformed values are converted to missing values. The existing median imputation step then handles those missing values during preprocessing.
+
+### Regression Testing
+
+Regression tests were added to verify that:
+
+* Inference data without `customer_id` is rejected with a clear error.
+* Valid numeric strings are converted correctly.
+* Invalid numeric strings are treated as missing values.
+* The fitted preprocessor can transform future data without changing the feature structure.
+* No missing values remain in the processed model input.
+
+Run the test suite with:
+
+```bash
+python -m pytest -q
+```
+
+Current result:
+
+```text
+7 passed
+```
+
+### Debugging Outcome
+
+The final workflow successfully:
+
+* Processes training and test data into 11 consistent model features.
+* Preserves `customer_id` in future-data output.
+* Handles missing and malformed numerical values.
+* Ignores unseen categories during one-hot encoding.
+* Reports unseen categories separately for data-quality monitoring.
+* Produces transformed datasets with no remaining missing values.
